@@ -1,0 +1,14 @@
+x_i: x in int form
+x_a: x as a string of hex char pairs
+x_b: x in the form of bytes
+x_s: x as an ASCII string
+
+x_i = int(x_a, 16)
+x_a = "{:x}".format(x_i)
+x_a = binascii.hexlify(x_b)
+x_b = binascii.unhexlify(x_a)
+x_s = x_b.decode('utf-8')
+x_b = x_s.encode('utf-8')
+
+z_i = x_i ^ y_i
+z is the XOR of x and y
