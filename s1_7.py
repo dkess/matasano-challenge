@@ -2,14 +2,16 @@ import base64
 
 from Crypto.Cipher import AES
 
-key_s = 'YELLOW SUBMARINE'
+import util
 
-cipher = AES.new(key_s.encode('utf-8'), AES.MODE_ECB)
+key_b = b'YELLOW SUBMARINE'
 
-s = ''
-with open('7.txt') as f:
-    s = ''.join(l.strip() for l in f)
+cipher = AES.new(key_b, AES.MODE_ECB)
+
+f = open('7.txt')
+s = ''.join(l.strip() for l in f)
+f.close()
 
 enc_b = base64.standard_b64decode(s)
 
-print(cipher.decrypt(enc_b).decode('utf-8'))
+print(util.b2s(cipher.decrypt(enc_b)))
