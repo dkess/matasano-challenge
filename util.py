@@ -1,6 +1,8 @@
 import binascii
 from string import ascii_letters
 
+from Crypto.Cipher import AES
+
 def a2i(a):
     """Converts a string of hex char pairs to an int"""
     return int(a, 16)
@@ -61,3 +63,11 @@ def make_chunks(l, n):
     """Takes an iterable and breaks it up into chunks of length n.
     Example: make_chunks([1,2,3,4,5,6,7], 2) -> [[1,2], [3,4], [5,6], [7]]"""
     return [l[i:i+n] for i in range(0, len(l), n)]
+
+def pkcs7pad(b, size):
+    """Pads a bytestring with \x04."""
+    length = len(b)
+    if size > length:
+        return b + b'\x04' * (size - length)
+    return b
+
