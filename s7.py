@@ -14,4 +14,4 @@ f.close()
 
 enc_b = base64.standard_b64decode(s)
 
-print(util.b2s(cipher.decrypt(enc_b)))
+print(util.b2s(util.aes_ecb_dec(enc_b, key_b)))

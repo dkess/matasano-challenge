@@ -71,3 +71,19 @@ def pkcs7pad(b, size):
         return b + b'\x04' * (size - length)
     return b
 
+ecb_cache = {}
+def aes_ecb_enc(msg_b, key_b):
+    try:
+        return ecb_cache[key_b].encrypt(msg_b)
+    except KeyError:
+        cipher = AES.new(key_b, AES.MODE_ECB)
+        ecb_cache[key_b] = cipher
+        return cipher.encrypt(msg_b)
+
+def aes_ecb_dec(enc_b, key_b):
+    try:
+        return ecb_cache[key_b].decrypt(enc_b)
+    except KeyError:
+        cipher = AES.new(key_b, AES.MODE_ECB)
+        ecb_cache[key_b] = cipher
+        return cipher.decrypt(enc_b)
