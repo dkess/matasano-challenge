@@ -1,4 +1,6 @@
 import binascii
+from itertools import repeat
+import random
 from string import ascii_letters
 
 from Crypto.Cipher import AES
@@ -74,16 +76,41 @@ def pkcs7pad(b, size):
 ecb_cache = {}
 def aes_ecb_enc(msg_b, key_b):
     try:
-        return ecb_cache[key_b].encrypt(msg_b)
+        cipher = ecb_cache[key_b]
     except KeyError:
         cipher = AES.new(key_b, AES.MODE_ECB)
         ecb_cache[key_b] = cipher
-        return cipher.encrypt(msg_b)
+    return cipher.encrypt(msg_b)
 
 def aes_ecb_dec(enc_b, key_b):
     try:
-        return ecb_cache[key_b].decrypt(enc_b)
+        cipher = ecb_cache[key_b]
     except KeyError:
         cipher = AES.new(key_b, AES.MODE_ECB)
         ecb_cache[key_b] = cipher
-        return cipher.decrypt(enc_b)
+    return cipher.decrypt(enc_b)
+
+def xor_bytestring(a_b, b_b):
+    """XORs two bytestrings.  If one is longer than the other, it will be
+    truncated to the length of the shortest bytestring."""
+    return bytes(a ^ b for a, b in zip(a_b, b_b))
+
+def cbc_enc(msg_b, key_b, iv=repeat(0), enc=aes_ecb_enc):
+    o = bytes()
+    last = iv
+    for c in make_chunks(msg_b, 16):
+        last = enc(xor_bytestring(pkcs7pad(msg_b, 16), last), key_b)
+        o += last
+    return o
+
+def cbc_dec(enc_b, key_b, iv=repeat(0), dec=aes_ecb_dec):
+    o = bytes()
+    last = iv
+    for c in make_chunks(enc_b, 16):
+        o += xor_bytestring(dec(c, key_b), last)
+        last = c
+    return o
+
+def random_key(length=16):
+    return bytes(random.randrange(256) for _ in range(length))
+

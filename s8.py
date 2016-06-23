@@ -2,7 +2,9 @@ import util
 import binascii
 
 f = open('8.txt')
-texts = [util.a2b(l.strip()) for l in f]
+texts = []
+for l in f:
+         texts.append(util.a2b(l.strip()))
 f.close()
 
 # break the ciphertext into 16 byte chunks, and pick the one with the most
