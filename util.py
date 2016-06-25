@@ -1,5 +1,6 @@
 import binascii
 from itertools import repeat
+import math
 import random
 from string import ascii_letters
 
@@ -68,7 +69,7 @@ def make_chunks(l, n):
 
 def pkcs7pad(b, size):
     """Pads a bytestring with \x04."""
-    length = len(b)
+    length = len(b) % size
     if size > length:
         return b + b'\x04' * (size - length)
     return b
@@ -111,6 +112,11 @@ def cbc_dec(enc_b, key_b, iv=repeat(0), dec=aes_ecb_dec):
         last = c
     return o
 
-def random_key(length=16):
+def random_bytes(length):
     return bytes(random.randrange(256) for _ in range(length))
 
+def detect_ecb(enc_b):
+    """Returns true if enc_b was probably encrypted with ECB"""
+    uniq = len(set(tuple(chunk) for chunk in make_chunks(enc_b, 16)))
+    length = math.ceil(len(enc_b) / 16)
+    return uniq / length < 0.99
