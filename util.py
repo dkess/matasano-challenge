@@ -64,10 +64,11 @@ def make_chunks(l, n):
     return [l[i:i+n] for i in range(0, len(l), n)]
 
 def pkcs7pad(b, size):
-    """Pads a bytestring with \x04."""
+    """Pads a bytestring."""
     length = len(b) % size
     if size > length:
-        return b + b'\x04' * (size - length)
+        n = size - length
+        return b + bytes([n] * n)
     return b
 
 ecb_cache = {}
@@ -116,3 +117,4 @@ def detect_ecb(enc_b):
     uniq = len(set(tuple(chunk) for chunk in make_chunks(enc_b, 16)))
     length = math.ceil(len(enc_b) / 16)
     return uniq / length < 0.99
+
