@@ -118,3 +118,22 @@ def detect_ecb(enc_b):
     length = math.ceil(len(enc_b) / 16)
     return uniq / length < 0.99
 
+class PKCS7Error(Exception):
+    pass
+
+def strip_pkcs7(msg_b):
+    if msg_b[-1] > 16:
+        return msg_b
+
+    count = 0
+    for c in reversed(msg_b):
+        if c > 16:
+            if count == msg_b[-1]:
+                return msg_b[:-count]
+            else:
+                raise PKCS7Error()
+        else:
+            if c != msg_b[-1]:
+                raise PKCS7Error()
+        count += 1
+    raise PKCS7Error()
