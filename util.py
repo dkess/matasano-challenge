@@ -63,13 +63,10 @@ def make_chunks(l, n):
     Example: make_chunks([1,2,3,4,5,6,7], 2) -> [[1,2], [3,4], [5,6], [7]]"""
     return [l[i:i+n] for i in range(0, len(l), n)]
 
-def pkcs7pad(b, size):
+def pkcs7pad(b, size=16):
     """Pads a bytestring."""
-    length = len(b) % size
-    if size > length:
-        n = size - length
-        return b + bytes([n] * n)
-    return b
+    padlen = ((size - len(b) - 1) % 16) + 1
+    return b + bytes([padlen]) * padlen
 
 ecb_cache = {}
 def aes_ecb_enc(msg_b, key_b):
@@ -121,19 +118,13 @@ def detect_ecb(enc_b):
 class PKCS7Error(Exception):
     pass
 
-def strip_pkcs7(msg_b):
-    if msg_b[-1] > 16:
-        return msg_b
+def strip_pkcs7(msg_b, size=16):
+    padlen = msg_b[-1]
 
-    count = 0
-    for c in reversed(msg_b):
-        if c > 16:
-            if count == msg_b[-1]:
-                return msg_b[:-count]
-            else:
-                raise PKCS7Error()
-        else:
-            if c != msg_b[-1]:
-                raise PKCS7Error()
-        count += 1
-    raise PKCS7Error()
+    if padlen > size:
+        raise PKCS7Error
+
+    if msg_b[-padlen:] != bytes([padlen]) * padlen:
+        raise PKCS7Error
+
+    return msg_b[:-padlen]
