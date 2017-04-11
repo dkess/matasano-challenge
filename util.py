@@ -121,7 +121,7 @@ class PKCS7Error(Exception):
 def strip_pkcs7(msg_b, size=16):
     padlen = msg_b[-1]
 
-    if padlen > size:
+    if padlen > size or padlen == 0:
         raise PKCS7Error
 
     if msg_b[-padlen:] != bytes([padlen]) * padlen:
