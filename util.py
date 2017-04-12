@@ -106,6 +106,14 @@ def cbc_dec(enc_b, key_b, iv=repeat(0), dec=aes_ecb_dec):
         last = c
     return o
 
+def ctr(msg_b, key_b, nonce=repeat(0), enc=aes_ecb_enc):
+    o = bytes()
+    for counter, c in enumerate(make_chunks(msg_b, 16)):
+        counter_b = bytes([0]) * 8 + counter.to_bytes(8, byteorder='little')
+        stream = enc(xor_bytestring(counter_b, nonce), key_b)
+        o += xor_bytestring(stream, c)
+    return o
+
 def random_bytes(length):
     return bytes(random.randrange(256) for _ in range(length))
 
