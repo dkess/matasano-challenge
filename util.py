@@ -38,7 +38,7 @@ def single_byte_xor(enc_b, key_i):
 def score_plaintext(s):
     """ Takes a plaintext string and gives it an int score based on how
     comprehensible it is."""
-    return sum(c in ascii_letters or c in ' ,.\'"1234567890\n' for c in s)
+    return sum(c in ascii_letters or c in ' ,.\'"\n' for c in s)
 
 def repeating_key_xor(msg_b, key_b):
     """Encrypts a message (in bytes format) with a key (also in bytes format).
