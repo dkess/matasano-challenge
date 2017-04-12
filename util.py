@@ -94,7 +94,7 @@ def cbc_enc(msg_b, key_b, iv=repeat(0), enc=aes_ecb_enc):
     o = bytes()
     last = iv
     for c in make_chunks(msg_b, 16):
-        last = enc(xor_bytestring(pkcs7pad(msg_b, 16), last), key_b)
+        last = enc(xor_bytestring(c, last), key_b)
         o += last
     return o
 

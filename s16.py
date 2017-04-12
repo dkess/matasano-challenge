@@ -17,4 +17,5 @@ def has_admin(enc_b):
 
 normal = f1(b'')
 switch = util.xor_bytestring(GOAL, (PREFIX + SUFFIX)[16:])
+switch = util.xor_bytestring(normal[:16], switch)
 print(has_admin(switch + normal[len(switch):]))
