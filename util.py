@@ -136,3 +136,53 @@ def strip_pkcs7(msg_b, size=16):
         raise PKCS7Error
 
     return msg_b[:-padlen]
+
+class MT19937:
+    def __init__(self, seed):
+        self.kw = 64
+        self.kn = 312
+        self.km = 156
+        self.kr = 31
+        self.ka = 0x9908B0DF
+        self.ku = 11
+        self.kd = 0xFFFFFFFF
+        self.ks = 7
+        self.kb = 0x9D2C5680
+        self.kt = 15
+        self.kc = 0xEFC60000
+        self.kl = 18
+        self.kf = 1812433253
+
+        self.lower_mask = (1 << self.kr) - 1
+        self.upper_mask = ((2 ** self.kw) - 1) & (~self.lower_mask)
+
+        self.state = [0] * self.kn
+        self.index = self.kn
+        self.state[0] = seed
+        for i in range(1, self.kn):
+            self.state[i] = ((2 ** self.kw) - 1) & (self.kf * (self.state[i-1] ^ (self.state[i-1] >> (self.kw - 2))) + i)
+
+    def extract_number(self):
+        if self.index >= self.kn:
+            if self.index > self.kn:
+                raise ValueError
+            self.twist()
+
+        y = self.state[self.index]
+        y ^= (y >> self.ku) & self.kd
+        y ^= (y << self.ks) & self.kb
+        y ^= (y << self.kt) & self.kc
+        y ^= (y >> self.kl)
+
+        self.index += 1
+        return ((2 ** self.kw) - 1) & y
+
+    def twist(self):
+        for i in range(self.kn):
+            x = (self.state[i] & self.upper_mask) + (self.state[(i+1) % self.kn] & self.lower_mask)
+            xA = x >> 1
+            if x % 2:
+                xA ^= self.ka
+
+            self.state[i] = self.state[(i + self.km) % self.kn] ^ xA
+        self.index = 0
