@@ -139,9 +139,9 @@ def strip_pkcs7(msg_b, size=16):
 
 class MT19937:
     def __init__(self, seed):
-        self.kw = 64
-        self.kn = 312
-        self.km = 156
+        self.kw = 32
+        self.kn = 624
+        self.km = 397
         self.kr = 31
         self.ka = 0x9908B0DF
         self.ku = 11
